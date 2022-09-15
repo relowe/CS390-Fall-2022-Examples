@@ -1,0 +1,47 @@
+ < program > ::= < statement > 
+                 | < program > < statement > 
+
+
+< statement > ::= < assignment > 
+                   | < expression >  
+
+< assignment > ::= < variable > "=" < expression > 
+ 
+< Expression > ::=  < Expression > "+" < Term > 
+                    | < Expression > "-" < Term > 
+                    | < Term >  
+
+< Term >        ::= < Term > "*" < Factor > 
+                    | < Term > "/" < Factor > 
+                    | < Factor > 
+
+  
+< Factor >      ::= < Exponent > "^" < Factor > 
+                    | < Exponent > 
+
+
+< Exponent >    ::= "(" < Expression > ")" 
+                     | < Variable > 
+                     | < Number > 
+
+  
+
+< variable > ::= < letter > 
+ 
+
+< number >  ::= < integer-literal >  
+                | < float-literal > 
+
+ 
+
+ < integer-literal > ::= < digit > 
+                         | < integer-literal > < digit >  
+
+ 
+
+< float-literal > ::= < integer-literal > "." < integer-literal > 
+                      | "." < integer-literal > 
+
+ 
+
+ 
