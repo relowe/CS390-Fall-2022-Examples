@@ -1,0 +1,16 @@
+COBOL - COmmon Business Oriented Language
+  - 1959 derived from a language called Flowmatic (Grace Hopper)
+  - First language to be standardized (1960)
+  - 60 - 70% of the world's financial transaction take place in COBOL
+
+  - Extremely large language. (1300 keywords) 
+
+
+  - C is version 1, C++ is version 2
+    COBOL is version 1
+    HAVING COBOL ADD 1 TO COBOL GIVING COBOL     version 2
+
+  - English-Like, not Math-like
+    - divided into sentences, which end with periods "."
+    - sentences are grouped into paragraphs.
+    - paragraphs are grouped into divisions
