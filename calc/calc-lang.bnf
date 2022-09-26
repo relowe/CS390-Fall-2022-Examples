@@ -6,6 +6,7 @@ Parser Grammar (Context Free)
 
 < statement > ::= < assignment > 
                    | < expression >  
+                   | < Input >
 
 < assignment > ::= VARIABLE EQUAL < expression > 
  
@@ -26,7 +27,7 @@ Parser Grammar (Context Free)
                      | VARIABLE
                      | < Number > 
 
-  
+< Input > ::= INPUT VARIABLE
 
 
 < number >  ::= INTLIT
@@ -44,9 +45,10 @@ PLUS        +
 MINUS       -
 TIMES       *
 DIVIDE      /
-POW         ^
+POW         ^ | **
 LPAREN      (
 RPAREN      )
-VARIABLE    A letter
+VARIABLE    ([a-zA-Z]|_)[a-zA-Z0-9_]*
 INTLIT      a string of digits
 FLOATLIST   INTLIT . INTLIT
+INPUT       input

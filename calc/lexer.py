@@ -29,6 +29,18 @@ To Write a Lexer
 
 4.) Implement the "next" function which consumes and returns
     the next matched token detail structure.
+
+    Group Tokens into the following categories:
+    1.) Single character tokens which are not the prefix of any other
+        token.
+    2.) Multiple-Character tokens where each token is of fixed length
+        and there may be common prefixes. (The token shares no 
+        prefix in common with a group 3 token.)
+    3.) Everything else (variable width)
+        - usually requires a customized approach
+        - Consume until an inconsistency is reached.
+        - Match any fixed tokens
+        - Implementing a finite state machine
 """
 import sys
 from enum import Enum,auto
@@ -48,7 +60,8 @@ class Token(Enum):
     RPAREN = auto()
     VARIABLE = auto()
     INTLIT = auto()
-    FLOATLIST = auto()
+    FLOATLIT = auto()
+    INPUT = auto()
     INVALID = auto()
     EOF = auto()
 
@@ -134,18 +147,10 @@ class Lexer:
         Recognize group 1 tokens. (Single character tokens which
         are not the prefix of any other token.)
         """
-
-        # handle variables
-        if self.__cur_char.isalpha():
-            self.__tok = self.__create_tok(Token.VARIABLE)
-            self.consume()
-            return True
-
         # handle the fixed single characters
         t = [('=', Token.EQUAL),
              ('+', Token.PLUS),
              ('-', Token.MINUS),
-             ('*', Token.TIMES),
              ('/', Token.DIVIDE),
              ('^', Token.POW),
              ('(', Token.LPAREN),
@@ -158,6 +163,128 @@ class Lexer:
 
         return False
 
+    def __lex_multi_fixed(self):
+        """
+        Attempt to match multi-character tokens which may overlap in
+        prefix.
+        """
+        t = [ ('*', Token.TIMES), ('**', Token.POW) ]
+        
+        # Edit the above ^^^^^^   Only that. (Yes really)
+        # when doing your homework, you should not need to change any
+        # of the rest of the code in this function
+
+        # accumulate characters until there is only one possibility 
+        cur_lex = ""
+        line = self.__line
+        col = self.__col
+        while len(t) > 1:
+            # try the next character
+            trial_lex = cur_lex + self.__cur_char
+
+            # find the consistent tokens
+            t_old = t
+            t = [ tok for tok in t if tok[0].startswith(trial_lex) ]
+
+            # stop if we have eliminated all the tokens
+            if len(t) == 0:
+                t = t_old
+                break
+            else:
+                cur_lex = trial_lex
+                self.consume()
+
+        # handle no match
+        if len(cur_lex) == 0:
+            return False
+
+        # find an exact match in the tokens
+        t = [ tok for tok in t if tok[0] == cur_lex ]
+
+        if len(t) < 1:
+            # incomplete token
+            self.__tok = self.__create_tok(Token.INVALID, lexeme = cur_lex, line=line, col=col)
+        else:
+            # token found
+            self.__tok = self.__create_tok(t[0][1], lexeme = cur_lex, line=line, col=col)
+
+        return True
+
+
+    def __lex_other(self):
+        # narrow things down by first character
+        if self.__cur_char.isdigit() or self.__cur_char == ".":
+            return self.__lex_number()
+        elif self.__cur_char.isalpha() or self.__cur_char == "_":
+            return self.__lex_keyword_or_var()
+        return False
+
+
+    def __lex_number(self):
+        # preserve where things begin
+        cur_lex = ""
+        line = self.__line
+        col = self.__col
+
+        # consume the leading digits 
+        while self.__cur_char.isdigit():
+            cur_lex += self.__cur_char
+            self.consume()
+        
+        # assume we have an integer
+        t = Token.INTLIT
+
+        # check to see if we proceed
+        if self.__cur_char == ".":
+            t = Token.FLOATLIT
+            cur_lex += self.__cur_char
+            self.consume()
+            while self.__cur_char.isdigit():
+                cur_lex += self.__cur_char
+                self.consume()
+
+        # invalid check
+        if cur_lex[-1] == '.':
+            t = Token.INVALID
+
+        # construct the value
+        if t == Token.INTLIT:
+            v = int(cur_lex)
+        elif t == Token.FLOATLIT:
+            v = float(cur_lex)
+        else:
+            v = None
+
+        #construct the token 
+        self.__tok = self.__create_tok(t, cur_lex, v, line, col)
+        return True
+
+
+    def __lex_keyword_or_var(self):
+        kw = [ ('input', Token.INPUT) ]
+
+        # ^^^^^ Modify only the keyword list to use this function ^^^^^^^
+        
+        # start things off
+        cur_lex = ''
+        line = self.__line
+        col = self.__col
+
+        # accumulate all consistent characters
+        while self.__cur_char.isalpha() or self.__cur_char.isdigit() or self.__cur_char == '_':
+            cur_lex += self.__cur_char
+            self.consume()
+
+        # check if it's a keyword
+        kw = [ tok for tok in kw if tok[0] == cur_lex ]
+        if len(kw) == 1:
+            t = kw[0][1]
+        else:
+            t = Token.VARIABLE
+
+        self.__tok = self.__create_tok(t, cur_lex, line=line, col=col)
+        return True
+
 
     def next(self):
         """
@@ -169,6 +296,10 @@ class Lexer:
         self.skip_space()
 
         if self.__lex_single():
+            return self.__tok
+        elif self.__lex_multi_fixed():
+            return self.__tok
+        elif self.__lex_other():
             return self.__tok
 
         # Catch all
