@@ -131,6 +131,9 @@ class Lexer:
         """
         return self.__col
 
+    def get_tok(self):
+        return self.__tok
+
     def __create_tok(self, token, lexeme=None, value=None, line=None, col=None):
         if not lexeme:
             lexem = self.__cur_char
@@ -295,7 +298,11 @@ class Lexer:
         #in our language, we skip spaces between tokens
         self.skip_space()
 
-        if self.__lex_single():
+        # detect end of file
+        if not self.__cur_char:
+            self.__tok = self.__create_tok(Token.EOF)
+            return self.__tok
+        elif self.__lex_single():
             return self.__tok
         elif self.__lex_multi_fixed():
             return self.__tok
@@ -312,7 +319,7 @@ class Lexer:
 if __name__ == '__main__':
     lex = Lexer()
     
-    while True:
+    while lex.get_tok().token != Token.EOF:
         print(lex.next())
 
 
