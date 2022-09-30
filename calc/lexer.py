@@ -102,13 +102,21 @@ class Lexer:
             self.__line += 1
 
 
-    def skip_space(self):
+    def skip_space_and_comments(self):
         """
-        Consume characters until we encounter something other than
-        a space
+        Consumes characters until we encounter non-whitespace.
+        Also, skips comments.
+        Also, stops on end of file.
         """
-        while self.__cur_char.isspace():
-            self.consume()
+        while self.__cur_char.isspace() or self.__cur_char == '#':
+            if self.__cur_char == '#':
+                # consume the rest of the line
+                while self.__cur_char and self.__cur_char != '\n':
+                    self.consume()
+
+            # consume all the whitespace
+            while self.__cur_char.isspace():
+                self.consume()
 
 
     def get_char(self):
@@ -296,7 +304,7 @@ class Lexer:
         """
 
         #in our language, we skip spaces between tokens
-        self.skip_space()
+        self.skip_space_and_comments()
 
         # detect end of file
         if not self.__cur_char:
