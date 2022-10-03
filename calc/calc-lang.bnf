@@ -1,31 +1,63 @@
+Eliminating Left Recursion
+
+Replace:
+
+< A > ::= < A > a1
+          | < A > a2
+          ...
+          | < A > an
+          | < B >
+
+With:
+  < A > ::= < B > < A' > 
+
+  < A' > ::= a1 < B > < A' >
+             | a2 < B > < A' >
+             | ...
+             | an < B > < A' >
+             | ""
+
 Parser Grammar (Context Free)
 =============================
 < program >  ::= < statement > 
                  | < program > < statement > 
+ - I know from experience that this is a while loop
+   that reads statements until EOF.
+ - I could convert this to right recursion.
 
 
-< statement > ::= < assignment > 
-                   | < expression >  
-                   | < Input >
+< statement > ::= VARIABLE < AO-Expression >
+                  | LPAREN < Expression > RPAREN
+                  | INTLIT < Expression' >
+                  | FLOATLIT < Expression' >
+                  | < Input >
 
-< assignment > ::= VARIABLE EQUAL < expression > 
- 
-< Expression > ::=  < Expression > PLUS < Term > 
-                    | < Expression > MINUS < Term > 
-                    | < Term >  
+< AO-Expression > ::= EQUAL < Expression >
+                      | < Expression' >
 
-< Term >        ::= < Term > TIMES < Factor > 
-                    | < Term > DIVIDE < Factor > 
-                    | < Factor > 
+< Expression > ::= < Term > < Expression' >
+
+< Expression' > ::= PLUS < Term > < Expression' > 
+                    | MINUS < Term > < Expression' > 
+                    | ""
+
+< Term >        ::= < Factor > < Term' >
+
+< Term' >       ::= TIMES < Factor > < Term' > 
+                    | DIVIDE < Factor >  < Term' >
+                    | ""
 
   
-< Factor >      ::= < Exponent > POW < Factor > 
-                    | < Exponent > 
+< Factor >      ::= < Exponent > < Factor' >
+
+< Factor' >     ::= POW < Factor > 
+                    | ""
 
 
 < Exponent >    ::= LPAREN < Expression > RPAREN
                      | VARIABLE
                      | < Number > 
+
 
 < Input > ::= INPUT VARIABLE
 
