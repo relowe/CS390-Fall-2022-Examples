@@ -1,0 +1,15 @@
+BEGIN
+    INT i:=0;
+    [10] INT ar;
+    [-5 : 4] INT ar2;
+
+    FOR i FROM -5 TO 4
+    DO
+        read(ar2[i])
+    OD;
+
+    FOR i FROM 4 BY -1 TO -5
+    DO
+        print((i, ar2[i],newline)) 
+    OD
+END

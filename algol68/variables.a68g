@@ -1,0 +1,33 @@
+BEGIN
+    INT i;
+    REAL num, average;
+
+    print(("Enter numbers, enter a negative number to exit."));
+
+    # initialize some variables #
+    i := 0;
+    num :=0;
+    average :=0;
+
+    WHILE num >= 0
+    DO
+        # read the number #
+        read(num);
+
+        # add it to the average if num >= 0 #
+        IF num >= 0 
+        THEN
+           average := average + num;
+           i := i + 1
+        FI
+    OD;
+
+    # Finish the average #
+    IF i > 0 
+    THEN
+      average := average / i
+    FI;
+
+    print(("Average: ", average, newline))
+
+END

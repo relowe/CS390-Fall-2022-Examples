@@ -1,0 +1,15 @@
+First( < Assignment > ) = { VARIABLE }
+First( < Expression > ) = First ( < Term > )
+First( < Term > ) = First( < Factor > )
+First( < Factor > ) = First( < Exponent > )
+First( < Exponent > ) = { LPAREN, VARIABLE,
+                          INTLIT, FLOATLIT }
+First( < Input > ) = { INPUT }
+
+- Problem: The first of < Assignment > and
+   < Expression > have an overlap VARIABLE
+
+- Solution: A combination of substitution and 
+   refactoring of the rules.
+
+Cleanup: remove any unreachable rules

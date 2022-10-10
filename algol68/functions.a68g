@@ -1,0 +1,15 @@
+BEGIN
+    PROC nth even = (REF INT n)  INT :
+    BEGIN
+        # the final formula in a block is what
+          the block evaluates to.#
+        n := x *2;
+        n
+    END;
+
+    INT x:= 1;
+
+    print((nth even(x), " ", x,  newline));
+    print((nth ev  en(x), " ", x, new line))
+
+END

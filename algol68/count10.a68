@@ -1,0 +1,13 @@
+# count to 10 in algol #
+
+BEGIN
+
+INT i;
+
+FOR i FROM 1 TO 10
+DO
+    print((i, newline))
+OD
+
+
+END

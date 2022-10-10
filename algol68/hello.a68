@@ -1,0 +1,10 @@
+# Everyone's favorite first program #
+# ALGOL68 is one of the most complex languages #
+# ever devised. #
+# At the time: A language with no implementation #
+#              and no users. #
+#   Uses: Academics - Teaching and Publication #
+BEGIN
+    print(("Hello, world", newline));
+    print(("kthxbye", newline))
+END
