@@ -80,9 +80,13 @@ class Parser:
             self.__next()
         elif self.__has(Token.INTLIT):
             self.__next()
+            self.__factor2()
+            self.__term2()
             self.__expression2()
         elif self.__has(Token.FLOATLIT):
             self.__next()
+            self.__factor2()
+            self.__term2()
             self.__expression2()
         else:
             self.__must_be(Token.INPUT)
@@ -93,6 +97,8 @@ class Parser:
             self.__next()
             self.__expression()
         else:
+            self.__factor2()
+            self.__term2()
             self.__expression2()
 
 

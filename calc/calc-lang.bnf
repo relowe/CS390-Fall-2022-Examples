@@ -26,14 +26,14 @@ Parser Grammar (Context Free)
  - I could convert this to right recursion.
 
 
-< statement > ::= VARIABLE < AO-Expression >
+< statement > ::= VARIABLE  < AO-Expression >
                   | LPAREN < Expression > RPAREN
-                  | INTLIT < Expression' >
-                  | FLOATLIT < Expression' >
+                  | INTLIT < Factor' >< Term' > < Expression' >
+                  | FLOATLIT < Factor' > < Term' >< Expression' >
                   | < Input >
 
 < AO-Expression > ::= EQUAL < Expression >
-                      | < Expression' >
+                      | < Factor' >< Term' >< Expression' >
 
 < Expression > ::= < Term > < Expression' >
 
