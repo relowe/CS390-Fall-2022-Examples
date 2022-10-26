@@ -29,12 +29,55 @@ class ParseType(Enum):
     MUL = auto()
     DIV = auto()
     POW = auto()
+    NEG = auto()
+
+ariness = { ParseType.ATOMIC: 0, ParseType.INPUT: 1, 
+            ParseType.ASSIGN: 2, ParseType.ADD: 2, 
+            ParseType.SUB: 2, ParseType.MUL: 2, 
+            ParseType.DIV: 2, ParseType.POW: 2 , ParseType.NEG: 1}
 
 
 class ParseTree:
-    def __init__(self, node_type=ParseType.PROGRAM):
+    def __init__(self, node_type=ParseType.PROGRAM, token=None):
         self.node_type = node_type
         self.children = []
+        self.token = token
+
+    def print(self, level=0):
+        """
+        A handy print method. (for debugging) 
+        """
+
+        # get the midpoint
+        m = int(len(self.children)/2)-1
+
+        # left half
+        for c in self.children[-1:m:-1]:
+            c.print(level + 2)
+
+        # print our node
+        indent = ' '*level
+
+        if self.node_type == ParseType.ATOMIC:
+            print(indent, self.token.lexeme, sep='')
+        else:
+            print(indent, self.node_type.name, sep='')
+
+        # right half
+        for c in self.children[m::-1]:
+            c.print(level+2)
+
+
+    def insert_left_leaf(self, leaf):
+        """
+        Insert at the extreme left leaf position.
+        """
+        if len(self.children) < ariness[self.node_type]:
+            self.children.insert(0, leaf)
+            return 
+
+        self.children[0].insert_left_leaf(leaf)
+        
 
 class Parser:
     """
@@ -90,7 +133,7 @@ class Parser:
     def __program(self):
         self.__next()
 
-        tree = ParseTree(ParseType.PROGRAM)
+        tree = ParseTree(ParseType.PROGRAM, self.__lexer.get_tok())
 
         while not self.__has(Token.EOF):
             tree.children.append(self.__statement())
@@ -101,8 +144,7 @@ class Parser:
         if self.__has(Token.VARIABLE):
             leaf = self.__lexer.get_tok()
             self.__next()
-            left = ParseTree(ParseType.ATOMIC)
-            left.children.append(leaf)
+            left = ParseTree(ParseType.ATOMIC, token=leaf)
 
             node = self.__ao_expression(left)
             return node
@@ -122,7 +164,7 @@ class Parser:
     def __ao_expression(self, lv):
         if self.__has(Token.EQUAL):
             self.__next()
-            node = ParseTree(ParseType.ASSIGN)
+            node = ParseTree(ParseType.ASSIGN, self.__lexer.get_tok())
             node.children.append(lv)
             node.children.append(self.__expression())
             return node
@@ -148,7 +190,7 @@ class Parser:
         left = self.__term()
         node = self.__expression2()
         if node:
-            node.children.insert(0, left)
+            node.insert_left_leaf(left)
         else:
             node = left
         return node
@@ -157,23 +199,23 @@ class Parser:
     def __expression2(self):
         if self.__has(Token.PLUS):
             self.__next()
-            node = ParseTree(ParseType.ADD)
-            right = self.__term()
-            right2 = self.__expression2()
-            if right2:
-                right2.children.insert(0, right)
-                right = right2
-            node.children.append(right)
+            node = ParseTree(ParseType.ADD, self.__lexer.get_tok())
+            t = self.__term()
+            e = self.__expression2()
+            node.children.append(t)
+            if e:
+                e.insert_left_leaf(node)
+                node = e
             return node
         elif self.__has(Token.MINUS):
             self.__next()
-            node = ParseTree(ParseType.SUB)
-            right = self.__term()
-            right2 = self.__expression2()
-            if right2:
-                right2.children.insert(0, right)
-                right = right2
-            node.children.append(right)
+            node = ParseTree(ParseType.SUB, self.__lexer.get_tok())
+            t = self.__term()
+            e = self.__expression2()
+            node.children.append(t)
+            if e:
+                e.insert_left_leaf(node)
+                node = e
             return node
         else:
             return False
@@ -182,7 +224,7 @@ class Parser:
         left = self.__factor()
         node = self.__term2()
         if node:
-            node.children.insert(0, left)
+            node.insert_left_leaf(left)
         else:
             node = left
         return node
@@ -192,25 +234,27 @@ class Parser:
         if self.__has(Token.TIMES):
             self.__next()
 
-            node = ParseTree(ParseType.MUL)
-            right = self.__factor()
-            right2 = self.__term2()
-            if right2:
-                right2.children.insert(0,right)
-                right = right2
-            node.children.append(right)
+            node = ParseTree(ParseType.MUL, self.__lexer.get_tok())
+            f = self.__factor()
+            t = self.__term2()
+            node.children.append(f)
+
+            if t:
+                t.insert_left_leaf(node)
+                node = t
             return node
 
         elif self.__has(Token.DIVIDE):
             self.__next()
 
-            node = ParseTree(ParseType.DIV)
-            right = self.__factor()
-            right2 = self.__term2()
-            if right2:
-                right2.children.insert(0,right)
-                right = right2
-            node.children.append(right)
+            node = ParseTree(ParseType.DIV, self.__lexer.get_tok())
+            f = self.__factor()
+            t = self.__term2()
+            node.children.append(f)
+
+            if t:
+                t.insert_left_leaf(node)
+                node = t
             return node
 
         else: 
@@ -218,7 +262,11 @@ class Parser:
 
 
     def __factor(self):
-        left = self.__exponent()
+        if self.__has(Token.MINUS):
+            left = ParseTree(ParseType.NEG, self.__lexer.get_tok())
+            left.children.append(self.__exponent())
+        else:
+            left = self.__exponent()
         node = self.__factor2()
         if node:
             node.children.insert(0, left)
@@ -231,7 +279,7 @@ class Parser:
         if self.__has(Token.POW):
             self.__next()
 
-            node = ParseTree(ParseType.POW)
+            node = ParseTree(ParseType.POW, self.__lexer.get_tok())
             node.children.append(self.__factor())
             return node
         else:
@@ -248,8 +296,8 @@ class Parser:
         elif self.__has(Token.VARIABLE) or self.__has(Token.INTLIT) or self.__must_be(Token.FLOATLIT):
             leaf = self.__lexer.get_tok() 
             self.__next()
-            node = ParseTree(ParseType.ATOMIC)
-            node.children.append(leaf)
+            node = ParseTree(ParseType.ATOMIC, token=leaf)
+            return node
 
 
     def __input(self):
@@ -260,10 +308,9 @@ class Parser:
         self.__must_be(Token.VARIABLE)
 
         # build the node
-        node = ParseTree(ParseType.INPUT)
+        node = ParseTree(ParseType.INPUT, self.__lexer.get_tok())
         leaf = self.__lexer.get_tok()
-        left = ParseTree(ParseType.ATOMIC)
-        left.children.append(leaf)
+        left = ParseTree(ParseType.ATOMIC, leaf)
         node.children.append(left)
 
         self.__next()
@@ -274,4 +321,4 @@ class Parser:
 if __name__ == "__main__":
     p = Parser(Lexer())
     tree = p.parse()
-    print(tree.children)
+    tree.print()

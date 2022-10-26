@@ -49,6 +49,7 @@ Parser Grammar (Context Free)
 
   
 < Factor >      ::= < Exponent > < Factor' >
+                    | MINUS < Exponent > < Factor' >
 
 < Factor' >     ::= POW < Factor > 
                     | ""

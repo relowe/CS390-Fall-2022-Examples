@@ -130,3 +130,10 @@ What about an expression like this:
             It turns into a mess!
 
 The above is a common parser mistake.
+
+
+
+1+2+3+4
+3+3+4
+6+4
+10
