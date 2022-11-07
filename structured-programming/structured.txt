@@ -1,0 +1,68 @@
+Structured Programming
+======================
+1.) Typically use a block structure.
+
+     Strctured                  Imperative
+     ===============            ==================
+     if(condition) {            10 IF condition then goto block
+          // body               20 goto past the block
+     }                          30 BLOCK starts
+                                XX Block ends
+                                YY past the block
+
+
+     if(condition) {            10 IF condition THEN GOTO XX
+         // body 1              20 BEGIN ELSE
+     } else {                   EE GOTO YY
+         // body 2              XX Then Block
+     }                          YY beyond the block
+
+
+     while(condition) {         10 IF condition is false THEN GOTO XX
+        // body                 20 BODY
+     }                          YY GOTO 10
+                                XX Beyond the loop
+
+
+     do {                       10 BODY
+        // body                 XX IF condition THEN GOTO 10
+     } while(condition);        YY Beyond the loop
+
+2.) All blocks have exactly one entry point and one exit point.
+    break and continue violate structured programming.
+
+    # structured python         # unstructured python
+    x = int(input())            x = 0
+    while x != -1:              while x != -1:
+        sum = sum + x               x = int(input())
+        x = int(input())            if x == -1:
+                                        continue
+                                    sum = sum + x
+
+    Functions - One Entry & One Exit Point
+    
+    /* unstructured C */                    /* structured C */
+    int fib(int n)                          int fib(int n) 
+    {                                       {
+        if(n < 2) {                             if(n < 2) {
+            return 1;                               return 1;
+        }                                       } else {
+                                                    return fib(n-1) + fib(n-2);
+        return fib(n-1) + fib(n-2);             }
+    }                                       }
+
+
+
+Basic objection - Error Handling
+
+statement 1
+statement 2
+statement 3
+if(error) goto errro
+statement 4
+statement 5
+...
+return;
+
+error:
+   // error handler
