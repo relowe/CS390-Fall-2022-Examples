@@ -264,6 +264,7 @@ class Parser:
     def __factor(self):
         if self.__has(Token.MINUS):
             left = ParseTree(ParseType.NEG, self.__lexer.get_tok())
+            self.__next()
             left.children.append(self.__exponent())
         else:
             left = self.__exponent()
