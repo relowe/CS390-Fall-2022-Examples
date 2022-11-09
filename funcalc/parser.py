@@ -167,6 +167,8 @@ class Parser:
             return self.__print()
         elif self.__has(Token.IF):
             return self.__branch()
+        elif self.__has(Token.DEF):
+            return self.__def()
         else:
             return self.__expression()
 
@@ -215,6 +217,38 @@ class Parser:
             self.__next()
             result.children = [c, b1, b2]
             return result
+
+
+    def __def(self):
+        self.__next()
+        token = self.__lexer.get_tok()
+        self.__next()
+        self.__must_be(Token.LPAREN)
+        self.__next()
+        result = ParseTree(ParseType.DEF, token)
+        result.children.append(self.__parameter_list())
+        self.__must_be(Token.RPAREN)
+        self.__next()
+        result.children.append(self.__program())
+        self.__must_be(Token.END)
+        self.__next()
+        return result
+
+
+    def __parameter_list(self):
+        # My first wish would be a do..while in python
+        done = False
+        result = ParseTree(ParseType.ATOMIC, self.__lexer.get_tok())
+        while not done:
+            t = self.__lexer.get_tok()
+            result.children.append(ParseTree(ParseType.ATOMIC, t))
+            self.__next()
+            if self.__has(Token.COMMA):
+                self.__next()
+            else:
+                done = True
+        return result
+
 
     def __condition(self):
         left = self.__expression()
