@@ -34,6 +34,7 @@ Parser Grammar (Context Free)
                   | < function-def >
                   | < branch >
                   | < print >
+                  | < return >
 
 < AO-Expression > ::= EQUAL < Expression >
                       | <Variable'>< Factor' >< Term' >< Expression' >
@@ -54,6 +55,9 @@ Parser Grammar (Context Free)
                    | LT < Expression >
 
 < Print > ::= PRINT STRING
+              | PRINT < Expression >
+
+< Return > ::= RETURN < Expression >
 
 < Expression > ::= < Term > < Expression' >
 
@@ -122,4 +126,4 @@ ELSE        else
 PRINT       print
 
 STRING      "literal characters" (no escape sequences)
-
+RETURN      return

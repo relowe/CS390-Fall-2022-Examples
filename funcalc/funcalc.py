@@ -45,6 +45,7 @@ class RefEnv:
         self.tab = ChainMap()
         if parent:
             self.tab = ChainMap(self.tab, parent.tab)
+        self.return_value = None
 
     def lookup(self, name):
         """
@@ -96,19 +97,33 @@ def eval_parse_tree(t, env):
         return eval_lt(t, env)
     elif t.node_type == ParseType.ET:
         return eval_et(t, env)
+    elif t.node_type == ParseType.DEF:
+        return eval_def(t, env)
+    elif t.node_type == ParseType.CALL:
+        return eval_call(t, env)
+    elif t.node_type == ParseType.RETURN:
+        return eval_return(t, env)
 
 
 def eval_program(t, env):
     """
     Evaluate the program
     """
-
+    
+    fun_result = None
     for c in t.children:
         result = eval_parse_tree(c, env)
 
-        # print the result if it is not assign or input
-        if c.node_type not in (ParseType.INPUT, ParseType.ASSIGN):
-            print(result)
+        # remember any non-none result
+        if result is not None:
+            fun_result = result
+
+        # check to see if we have returned
+        if env.return_value is not None:
+            return env.return_value
+    return fun_result
+
+
 
 def eval_atomic(t, env):
     """
@@ -116,7 +131,7 @@ def eval_atomic(t, env):
     """
 
     # get literals
-    if t.token.token in (Token.INTLIT, Token.FLOATLIT):
+    if t.token.token in (Token.INTLIT, Token.FLOATLIT, Token.STRING):
         return t.token.value
     
     # get the variable
@@ -160,7 +175,7 @@ def eval_print(t, env):
     """
     Evaluate a print statement
     """
-    print(t.children[0].token.value)
+    print(eval_parse_tree(t.children[0], env))
 
 
 def eval_assign(t, env):
@@ -246,6 +261,63 @@ def eval_et(t, env):
     return eval_parse_tree(t.children[0], env) == eval_parse_tree(t.children[1], env) 
 
 
+def eval_def(t, env):
+    """
+    Define a function
+    """
+
+    # functions are always local (by design)
+    name = t.token.lexeme
+    env.insert(name, Ref(RefType.FUNCTION, t))
+
+
+def eval_call(t, env):
+    """
+    Call a function
+    """
+    name = t.children[0].token.lexeme
+    arglist = t.children[1]
+
+    # retrieve the function
+    fun = env.lookup(name)
+    if not fun:
+        print(f"Call to undefined function {name} on line {t.token.line}")
+        sys.exit(-1)
+    elif fun.ref_type != RefType.FUNCTION:
+        print(f"Call to non-function {name} on line {t.token.line}")
+        sys.exit(-1)
+    fun = fun.ref_value
+
+    # get the parameter list
+    paramlist = fun.children[0]
+
+    # verify the parameter list
+    if len(arglist.children) != len(paramlist.children):
+        print(f"Wrong number of parameters to function {name} on line {t.token.line}")
+        sys.exit(-1)
+
+    # create the local environment
+    local = RefEnv(env)
+
+    # all parameters are local (by design)
+    for i in range(len(paramlist.children)):
+        local.insert(paramlist.children[i].token.lexeme, 
+                     Ref(RefType.VARIABLE,
+                         eval_parse_tree(arglist.children[i], env)))
+
+    # call the function
+    return eval_parse_tree(fun.children[1], local)
+
+
+def eval_return(t, env):
+    """
+    Evaluate Return
+    """
+    env.return_value = eval_parse_tree(t.children[0], env)
+    return env.return_value
+
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         f = open(sys.argv[1])
@@ -255,3 +327,5 @@ if __name__ == "__main__":
     parser = Parser(l)
     pt = parser.parse()
     eval_parse_tree(pt, RefEnv())
+
+

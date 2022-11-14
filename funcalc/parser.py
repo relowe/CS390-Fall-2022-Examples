@@ -37,6 +37,9 @@ class ParseType(Enum):
     ET = auto()
     PRINT = auto()
     CALL = auto()
+    PARAMLIST=auto()
+    ARGLIST = auto()
+    RETURN = auto()
 
 ariness = { ParseType.ATOMIC: 0, ParseType.INPUT: 1, 
             ParseType.ASSIGN: 2, ParseType.ADD: 2, 
@@ -169,6 +172,8 @@ class Parser:
             return self.__branch()
         elif self.__has(Token.DEF):
             return self.__def()
+        elif self.__has(Token.RETURN):
+            return self.__return()
         else:
             return self.__expression()
 
@@ -184,6 +189,10 @@ class Parser:
 
         else:
             node = lv
+            v2 = self.__variable2()
+            if v2:
+                v2.children.insert(0, node)
+                node = v2
             left1 = self.__factor2()
             if left1:
                 left1.children.insert(0, node)
@@ -238,7 +247,7 @@ class Parser:
     def __parameter_list(self):
         # My first wish would be a do..while in python
         done = False
-        result = ParseTree(ParseType.ATOMIC, self.__lexer.get_tok())
+        result = ParseTree(ParseType.PARAMLIST, self.__lexer.get_tok())
         while not done:
             t = self.__lexer.get_tok()
             result.children.append(ParseTree(ParseType.ATOMIC, t))
@@ -371,7 +380,16 @@ class Parser:
             self.__must_be(Token.RPAREN)
             self.__next()
             return node
-        elif self.__has(Token.VARIABLE) or self.__has(Token.INTLIT) or self.__must_be(Token.FLOATLIT):
+        elif self.__has(Token.VARIABLE): 
+            leaf = self.__lexer.get_tok() 
+            self.__next()
+            v2 = self.__variable2()
+            node = ParseTree(ParseType.ATOMIC, token=leaf)
+            if v2:
+                v2.children.insert(0, node)
+                node = v2
+            return node
+        elif self.__has(Token.INTLIT) or self.__must_be(Token.FLOATLIT):
             leaf = self.__lexer.get_tok() 
             self.__next()
             node = ParseTree(ParseType.ATOMIC, token=leaf)
@@ -398,18 +416,52 @@ class Parser:
     def __print(self):
         self.__must_be(Token.PRINT)
         self.__next()
-
-        self.__must_be(Token.STRING)
-
-        # build the node
         node = ParseTree(ParseType.PRINT, self.__lexer.get_tok())
-        leaf = self.__lexer.get_tok()
-        left = ParseTree(ParseType.ATOMIC, leaf)
-        node.children.append(left)
 
-        self.__next()
+        if self.__has(Token.STRING):
+            # build the node
+            leaf = self.__lexer.get_tok()
+            left = ParseTree(ParseType.ATOMIC, leaf)
+            node.children.append(left)
+            self.__next()
+        else:
+            node.children.append(self.__expression())
+
         return node
 
+
+    def __return(self):
+        self.__must_be(Token.RETURN)
+        node = ParseTree(ParseType.RETURN, self.__lexer.get_tok())
+        self.__next()
+        node.children.append(self.__expression())
+        return node
+
+
+    def __variable2(self):
+        if not self.__has(Token.LPAREN):
+            return False
+
+        # this is a function call
+        result = ParseTree(ParseType.CALL, self.__lexer.get_tok())
+        self.__next()
+        argtree = ParseTree(ParseType.ARGLIST, self.__lexer.get_tok())
+        result.children.append(argtree)
+        arglist = argtree.children
+        done = False
+        while not done:
+            arglist.append(self.__expression())
+            #consume our comma if there is one and continue
+            if self.__has(Token.COMMA):
+                self.__next()
+            else:
+                done = True
+        self.__must_be(Token.RPAREN)
+        self.__next()
+
+
+        return result
+    
 
 # unit test 
 if __name__ == "__main__":

@@ -71,6 +71,7 @@ class Token(Enum):
     PRINT = auto()
     STRING = auto()
     COMMA = auto()
+    RETURN = auto()
     EOF = auto()
 
 TokenDetail = namedtuple('TokenDetail', ('token', 'lexeme', 'value', 'line', 'col'))
@@ -289,7 +290,8 @@ class Lexer:
                ('end', Token.END),
                ('if', Token.IF),
                ('else', Token.ELSE),
-               ('print', Token.PRINT)
+               ('print', Token.PRINT),
+               ('return', Token.RETURN)
              ]
 
         # ^^^^^ Modify only the keyword list to use this function ^^^^^^^
