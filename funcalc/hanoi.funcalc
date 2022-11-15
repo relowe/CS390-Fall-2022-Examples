@@ -1,0 +1,16 @@
+def solve(n, src, dest, spare)
+  if n = 1
+    print "Move"
+    print src
+    print dest
+    return 0
+  end
+
+  solve(n-1, src, spare, dest)
+  solve(1, src, dest, spare)
+  solve(n-1, spare, dest, src)
+end
+
+print "Tower of Hanoi Solver"
+input n
+solve(n, 1, 3, 2)
