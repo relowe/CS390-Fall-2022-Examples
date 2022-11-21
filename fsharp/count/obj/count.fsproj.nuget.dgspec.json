@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\rlowe\\OneDrive - Southeast Missouri State University\\Documents\\Fall 2022\\CS390\\CS390-Fall-2022-Examples\\fsharp\\count\\count.fsproj": {}
+  },
+  "projects": {
+    "C:\\Users\\rlowe\\OneDrive - Southeast Missouri State University\\Documents\\Fall 2022\\CS390\\CS390-Fall-2022-Examples\\fsharp\\count\\count.fsproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\rlowe\\OneDrive - Southeast Missouri State University\\Documents\\Fall 2022\\CS390\\CS390-Fall-2022-Examples\\fsharp\\count\\count.fsproj",
+        "projectName": "count",
+        "projectPath": "C:\\Users\\rlowe\\OneDrive - Southeast Missouri State University\\Documents\\Fall 2022\\CS390\\CS390-Fall-2022-Examples\\fsharp\\count\\count.fsproj",
+        "packagesPath": "C:\\Users\\rlowe\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\rlowe\\OneDrive - Southeast Missouri State University\\Documents\\Fall 2022\\CS390\\CS390-Fall-2022-Examples\\fsharp\\count\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\rlowe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "FSharp.Core": {
+              "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
+              "target": "Package",
+              "version": "[6.0.2, )",
+              "generatePathProperty": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

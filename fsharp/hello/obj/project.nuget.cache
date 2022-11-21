@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "K481bwNpdmXwIsfW2nxCXwWHk8chPnnbWZCsSyq0iAzRxngTRUGFnJN6ynnAwzm2gY11sTwU4w4hg6hpBwLtfA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\rlowe\\OneDrive - Southeast Missouri State University\\Documents\\Fall 2022\\CS390\\CS390-Fall-2022-Examples\\fsharp\\hello\\hello.fsproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rlowe\\.nuget\\packages\\fsharp.core\\6.0.2\\fsharp.core.6.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
