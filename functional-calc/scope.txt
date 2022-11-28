@@ -1,0 +1,49 @@
+Scope: A region of text in a program.
+
+Variable Binding
+   - Associate an attribute with a variable. (address, value, type, etc.)
+
+Reference Environment
+   - List of available symbols.
+
+Variable Availability
+   - How do we bind variables to their reference environment?
+   - Most languages use scope-resolved reference environment binding.
+
+
+Example (python)                Reference Environments                      
+    x = 5                       +--------------------------+         
+    def f():                    |Global                    |            
+       print(x)                 |  x=5    +---------------+|               
+       y=2                      |         |f:  y=2        ||          
+       print(x+y)               |         +---------------+|               
+    f()                         +--------------------------+       
+
+
+Example (python)                Reference Environments                      
+    x = 5                       +--------------------------+         
+    def f():                    |Global                    |            
+       print(x)                 |  x=5    +---------------+|               
+       y=2                      |         |f:  y=2        ||          
+       x=7                      |         |    x=7        ||
+       print(x+y)               |         +---------------+|               
+    f()                         +--------------------------+       
+    print(x)
+
+Shadowing: inner reference environment that has the same name
+  as an external reference environment.
+
+
+
+Funcalc Reference Environments
+==============================
+- Variables assigned for the first time in a function are local.
+- Variables assigned in an enclosing environment are not local. 
+  (No variable Shadowing)
+- Parameters are always local.
+
+Behave like C or Java
+
+
+Every time we evaluate something, the evaluation is relative to 
+some reference environment.

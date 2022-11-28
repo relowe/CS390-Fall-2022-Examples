@@ -1,0 +1,21 @@
+# Calculate the quadratic formula
+
+# get the coeffecients
+input a
+input b
+input c
+
+# compute the discriminant
+disc = b**2 - 4*a*c
+sqrt_disc = disc ** 0.5
+
+#compute the denominator
+denom = 2*a
+
+# compute the roots
+x1 = ((0-b) + sqrt_disc)/denom
+x2 = ((0-b) - sqrt_disc)/denom
+
+# print the roots
+x1
+x2

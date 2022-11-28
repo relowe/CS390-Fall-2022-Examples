@@ -1,0 +1,40 @@
+def f(x)
+   def g(y)
+      print "I'm g"
+   end
+   return g
+end
+
+x = f(1)
+x(2)
+
+
+def make_increment(inc)
+    def increment(x)
+        return x + inc
+    end
+
+    return increment
+end
+
+count5 = make_increment(5)
+count10 = make_increment(10)
+print count5(5)
+print count5(10)
+print count10(10)
+print count10(20)
+
+
+def f(x)
+   def g(y)
+      def h(z)
+        return x+y+z
+      end
+      return h
+   end
+   return g(2)
+end
+
+x = f(5)
+print x(12)
+

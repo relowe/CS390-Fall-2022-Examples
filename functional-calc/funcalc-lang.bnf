@@ -1,0 +1,129 @@
+Eliminating Left Recursion
+
+Replace:
+
+< A > ::= < A > a1
+          | < A > a2
+          ...
+          | < A > an
+          | < B >
+
+With:
+  < A > ::= < B > < A' > 
+
+  < A' > ::= a1 < B > < A' >
+             | a2 < B > < A' >
+             | ...
+             | an < B > < A' >
+             | ""
+
+Parser Grammar (Context Free)
+=============================
+< program >  ::= < statement > 
+                 | < program > < statement > 
+ - I know from experience that this is a while loop
+   that reads statements until EOF.
+ - I could convert this to right recursion.
+
+
+< statement > ::= VARIABLE  < AO-Expression >
+                  | LPAREN < Expression > RPAREN
+                  | INTLIT < Factor' >< Term' > < Expression' >
+                  | FLOATLIT < Factor' > < Term' >< Expression' >
+                  | < Input >
+                  | < function-def >
+                  | < branch >
+                  | < print >
+                  | < return >
+
+< AO-Expression > ::= EQUAL < Expression >
+                      | <Variable'>< Factor' >< Term' >< Expression' >
+
+< function-def >  ::= DEF VARIABLE LPAREN < parameter-list > RPAREN < program > END
+
+< parameter-list > ::= VARIABLE
+                       | < parameter-list > COMMA VARIABLE
+
+< branch > ::= IF < Condition > < program > < branch' >
+
+< branch' > ::=  END 
+                 | ELSE < program > END
+
+< Condition > ::= < Expression > < Condition' >
+
+< Condition' > ::= EQUAL < Expression >
+                   | LT < Expression >
+
+< Print > ::= PRINT STRING
+              | PRINT < Expression >
+
+< Return > ::= RETURN < Expression >
+
+< Expression > ::= < Term > < Expression' >
+
+< Expression' > ::= PLUS < Term > < Expression' > 
+                    | MINUS < Term > < Expression' > 
+                    | ""
+
+
+< Term >        ::= < Factor > < Term' >
+
+< Term' >       ::= TIMES < Factor > < Term' > 
+                    | DIVIDE < Factor >  < Term' >
+                    | ""
+
+  
+< Factor >      ::= < Exponent > < Factor' >
+                    | MINUS < Exponent > < Factor' >
+
+< Factor' >     ::= POW < Factor > 
+                    | ""
+
+
+< Exponent >    ::= LPAREN < Expression > RPAREN
+                     | VARIABLE < Variable' >
+                     | < Number > 
+
+< Variable' >    ::= LPAREN < Arg-List > RPAREN 
+                     | ""
+
+< Arg-List >    ::= < Expression >
+                    | < Arg-List > COMMA < Expression >
+
+
+< Input > ::= INPUT VARIABLE
+
+
+< number >  ::= INTLIT
+                | FLOATLIT
+
+ 
+ 
+
+Lexer Grammar (Regular)
+=======================
+Token       Rule
+-----       -----
+EQUAL       =
+PLUS        +
+MINUS       -
+TIMES       *
+DIVIDE      /
+POW         ^ | **
+LPAREN      (
+RPAREN      )
+VARIABLE    ([a-zA-Z]|_)[a-zA-Z0-9_]*
+INTLIT      a string of digits
+FLOATLIST   INTLIT . INTLIT
+INPUT       input
+COMMA       ,
+LT          <
+
+DEF         def
+END         end
+IF          if
+ELSE        else
+PRINT       print
+
+STRING      "literal characters" (no escape sequences)
+RETURN      return

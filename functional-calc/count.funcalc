@@ -1,0 +1,11 @@
+def count(x, limit)
+   if limit < x
+     return 0
+   end
+
+   print x
+
+   return count(x+1, limit)
+end
+
+count(1, 10)

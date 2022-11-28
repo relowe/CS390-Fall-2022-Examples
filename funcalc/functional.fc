@@ -1,0 +1,9 @@
+def f(x)
+   def g(y)
+      print "I'm g"
+   end
+   return g
+end
+
+x = f(1)
+x(2)
